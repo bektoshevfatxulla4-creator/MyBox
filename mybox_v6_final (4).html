@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#16a34a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>MyBox</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--g:#16a34a;--g2:#15803d;--g3:#bbf7d0;--g4:#f0fdf4;--bg:#f8fafc;--bd:#e2e8f0;--txt:#0f172a;--mu:#64748b;--li:#f1f5f9}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;max-width:480px;margin:0 auto}
+.hide{display:none!important}
+/* SCREENS */
+.scr{display:none;flex-direction:column;height:100vh}
+.scr.on{display:flex}
+/* FORMS */
+input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--txt);outline:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(22,163,74,.1)}
+textarea{resize:none;min-height:72px}
+label{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.f{margin-bottom:13px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 18px;height:44px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;font-size:14px;font-weight:700;cursor:pointer;color:var(--txt);font-family:inherit;transition:opacity .12s}
+.btn:active{opacity:.75;transform:scale(.98)}
+.g{background:var(--g);color:#fff;border-color:var(--g)}
+.g:hover{background:var(--g2)}
+.red{color:#dc2626;border-color:#fecaca;background:#fff}
+.w{width:100%}
+.sm{height:32px;padding:0 11px;font-size:12px;border-radius:8px}
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* NAVBAR */
+.nav{height:56px;background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.nav-r{display:flex;align-items:center;gap:4px}
+.ico{width:38px;height:38px;border:none;background:none;cursor:pointer;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--mu);position:relative}
+.ico:active{background:var(--li)}
+.cbadge{position:absolute;top:3px;right:3px;width:17px;height:17px;background:var(--g);color:#fff;border-radius:50%;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
+/* BOTTOM NAV */
+.bnav{background:#fff;border-top:1px solid var(--bd);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 5px;cursor:pointer;border:none;background:none;font-size:10px;font-weight:600;color:var(--mu);gap:3px;font-family:inherit;position:relative}
+.bni.on{color:var(--g)}
+.bni svg{width:21px;height:21px}
+.bni-dot{width:4px;height:4px;background:var(--g);border-radius:50%;position:absolute;top:0;display:none}
+.bni.on .bni-dot{display:block}
+/* PAGES */
+.pg{display:none;padding:14px;padding-bottom:80px}
+.pg.on{display:block}
+/* CARD */
+.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px}
+/* HERO */
+.hero{background:var(--g);border-radius:16px;padding:18px;color:#fff;margin-bottom:14px;overflow:hidden;position:relative}
+.hero::after{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,.08);border-radius:50%}
+.hero-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:100px;padding:3px 11px;font-size:11px;font-weight:600;display:inline-block;margin-bottom:8px}
+.hero-title{font-size:18px;font-weight:800;margin-bottom:5px;position:relative;z-index:1}
+.hero-sub{font-size:12px;opacity:.85;margin-bottom:14px;position:relative;z-index:1}
+.ai-chips{display:flex;gap:6px;flex-wrap:wrap;position:relative;z-index:1}
+.ac{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer}
+/* STATS */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:13px}
+.sv{font-size:19px;font-weight:800}
+.sl{font-size:11px;color:var(--mu);font-weight:600;margin-top:2px}
+/* CHART */
+.chart{height:80px;display:flex;align-items:flex-end;gap:4px;margin-bottom:5px}
+.bc{flex:1;display:flex;align-items:flex-end}
+.b{width:100%;border-radius:4px 4px 0 0;background:var(--g3);min-height:4px}
+.b.hi{background:var(--g)}
+/* AI */
+.ai-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--bd);border-radius:13px;padding:10px;margin-bottom:7px}
+.ai-img{width:40px;height:40px;background:var(--g4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.ai-img img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.add-ai{width:30px;height:30px;background:var(--g);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* CATS */
+.cscroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:7px;margin-bottom:12px;scrollbar-width:none}
+.cscroll::-webkit-scrollbar{display:none}
+.cpill{white-space:nowrap;padding:6px 13px;border-radius:100px;border:1.5px solid var(--bd);font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--mu)}
+.cpill.on{background:var(--g);color:#fff;border-color:var(--g)}
+/* SEARCH */
+.srch{position:relative;margin-bottom:12px}
+.srch input{padding-left:34px}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mu);pointer-events:none}
+/* PRODUCTS */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pc{background:#fff;border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.pimg{aspect-ratio:1;background:var(--li);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden}
+.pimg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.dtag{position:absolute;top:7px;left:7px;background:#ef4444;color:#fff;border-radius:100px;font-size:9px;font-weight:800;padding:2px 6px}
+.pbody{padding:9px}
+.pname{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:2px}
+.pcat{font-size:10px;color:var(--mu);margin-bottom:6px}
+.pfoot{display:flex;align-items:center;justify-content:space-between}
+.pprice{font-size:13px;font-weight:800;color:var(--g)}
+.qctrl{display:flex;align-items:center;gap:5px}
+.qb{width:26px;height:26px;border:1.5px solid var(--bd);border-radius:7px;background:#fff;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.qn{font-size:12px;font-weight:800;min-width:16px;text-align:center}
+.addbtn{width:30px;height:30px;background:var(--g);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+/* BOXES */
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.bcard{background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:13px;cursor:pointer}
+.bcard:active{border-color:var(--g);background:var(--g4)}
+.bico{width:44px;height:44px;background:var(--g3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:9px}
+/* CART */
+.ci{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--bd);border-radius:13px;padding:10px;margin-bottom:7px}
+.cimg{width:46px;height:46px;border-radius:10px;background:var(--li);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;overflow:hidden}
+.cimg img{width:100%;height:100%;object-fit:cover}
+.delbtn{width:26px;height:26px;background:#fee2e2;border:none;border-radius:7px;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sr{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--mu)}
+.stot{display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding-top:9px;border-top:1px solid var(--bd);margin-top:5px}
+.pnote{background:#fef9c3;border:1px solid #fde047;border-radius:9px;padding:9px;font-size:11px;color:#713f12;margin-top:9px}
+/* OVERLAY */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:flex-end;justify-content:center}
+.ov.on{display:flex}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:18px 18px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.hdl{width:36px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 18px}
+.st{font-size:17px;font-weight:800;margin-bottom:16px}
+/* FREQ */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.fbtn{padding:11px;border:1.5px solid var(--bd);border-radius:12px;background:#fff;cursor:pointer;text-align:left}
+.fbtn.on{border-color:var(--g);background:var(--g4)}
+.fn{font-size:12px;font-weight:700;display:block}
+.fd{font-size:10px;color:var(--mu);margin-top:2px;display:block}
+/* PROFILE */
+.ptop{text-align:center;padding:20px 0 14px}
+.pav{width:70px;height:70px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px;border:3px solid var(--g);overflow:hidden;cursor:pointer}
+.pav img{width:100%;height:100%;object-fit:cover}
+.tabbar{display:flex;background:var(--li);border-radius:10px;padding:3px;margin-bottom:14px}
+.tabbtn{flex:1;padding:7px;border-radius:8px;border:none;background:none;font-size:12px;font-weight:700;cursor:pointer;color:var(--mu);font-family:inherit}
+.tabbtn.on{background:#fff;color:var(--txt);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* ONBOARD */
+.obhead{background:var(--g);padding:44px 20px 22px;color:#fff;flex-shrink:0}
+.obprog{display:flex;gap:6px;margin-top:14px}
+.obdot{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.3)}
+.obdot.on{background:#fff}
+.obfoot{padding:12px 20px 28px;border-top:1px solid var(--bd);background:#fff;flex-shrink:0}
+.avup{width:78px;height:78px;border-radius:50%;background:var(--g3);border:3px solid var(--g);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;position:relative;overflow:hidden;margin:0 auto 16px}
+.avup img{width:100%;height:100%;object-fit:cover}
+.avlbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.45);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:3px 0}
+/* ADMIN */
+.atabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--bd);scrollbar-width:none;padding:0 4px;flex-shrink:0}
+.atabs::-webkit-scrollbar{display:none}
+.atab{white-space:nowrap;padding:13px 14px;border:none;background:none;font-size:12px;font-weight:700;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
+.atab.on{color:var(--g);border-bottom-color:var(--g)}
+.acont{flex:1;overflow-y:auto;padding:14px}
+.arow{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--bd);border-radius:13px;padding:11px;margin-bottom:7px}
+.athumb{width:50px;height:50px;border-radius:11px;background:var(--li);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
+.athumb img{width:100%;height:100%;object-fit:cover}
+/* IMG UPLOAD */
+.iup{width:74px;height:74px;border:2px dashed var(--bd);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--mu);font-size:10px;gap:3px;overflow:hidden;background:var(--li);flex-shrink:0}
+.iup img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700}
+.bg{background:#dcfce7;color:#166534}
+.bb{background:#dbeafe;color:#1e40af}
+.by{background:#fef9c3;color:#713f12}
+.br{background:#fee2e2;color:#991b1b}
+.bp{background:#f3e8ff;color:#6b21a8}
+.bmu{background:var(--li);color:var(--mu)}
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px}
+.eo{font-size:46px;margin-bottom:12px}
+.et{font-size:16px;font-weight:800;margin-bottom:4px}
+.es{font-size:13px;color:var(--mu)}
+/* TOAST */
+.toasts{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:5px;pointer-events:none;width:calc(100% - 24px);max-width:456px}
+.toast{background:#fff;border:1px solid var(--bd);border-radius:11px;padding:10px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.1);animation:ta .18s ease}
+@keyframes ta{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.tdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+/* SPINNER */
+.spin{width:22px;height:22px;border:2.5px solid var(--g3);border-top-color:var(--g);border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ld{display:flex;align-items:center;justify-content:center;gap:10px;padding:30px;color:var(--mu);font-size:13px}
+/* DIV */
+.dv{height:1px;background:var(--bd);margin:10px 0}
+/* LOGIN */
+.lbg{flex:1;overflow-y:auto;background:linear-gradient(150deg,#f0fdf4,#dcfce7 40%,#f8fafc);display:flex;align-items:center;justify-content:center;padding:20px}
+.lcard{background:#fff;border-radius:22px;padding:28px 22px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+</style>
+</head>
+<body>
+<div class="toasts" id="TR"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="scr on" id="S0">
+<div class="lbg">
+<div class="lcard">
+  <div style="text-align:center;margin-bottom:24px">
+    <img id="lg0" style="width:160px;height:auto" alt="MyBox"/>
+  </div>
+
+  <!-- Mijoz kirish -->
+  <div id="L1">
+    <div style="font-size:20px;font-weight:800;margin-bottom:4px">Xush kelibsiz! 👋</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:18px">Telefon raqamingizni kiriting</div>
+    <div class="f"><label>Telefon raqam</label><input id="lphone" type="tel" placeholder="+998 90 123 45 67" inputmode="tel"/></div>
+    <button class="btn g w" style="height:50px;font-size:15px;border-radius:13px;margin-bottom:12px" onclick="sendOtp()">Davom etish →</button>
+        <div style="text-align:center;margin-top:14px">
+      <span style="font-size:11px;color:#e2e8f0;cursor:pointer;user-select:none" onclick="switchTo('LA')" title="Admin">⚙</span>
+    </div>
+  </div>
+
+  <!-- OTP -->
+  <div id="L2" class="hide">
+    <div style="font-size:20px;font-weight:800;margin-bottom:4px">Kodni kiriting</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:18px" id="otpLabel">Telefon raqamingizga kod yuborildi</div>
+    <div class="f"><input id="lotp" style="text-align:center;font-size:26px;font-weight:800;letter-spacing:12px;font-family:monospace" maxlength="6" placeholder="——————" inputmode="numeric" oninput="if(this.value.length===6)verifyOtp()"/></div>
+    <p style="text-align:center;font-size:12px;color:var(--mu);margin-bottom:13px">Demo: istalgan 6 raqam yozing</p>
+    <button class="btn g w" style="height:50px;font-size:15px;border-radius:13px;margin-bottom:10px" onclick="verifyOtp()">Kirish</button>
+    <div style="text-align:center"><span style="color:var(--g);font-weight:700;cursor:pointer;font-size:13px" onclick="switchTo('L1')">← Orqaga</span></div>
+  </div>
+
+  <!-- Admin kirish — alohida, to'liq boshqacha -->
+  <div id="LA" class="hide">
+    <div style="font-size:20px;font-weight:800;margin-bottom:4px">Admin Panel</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:18px">Do'kon egasi uchun</div>
+    <div class="f"><label>Email</label><input id="aemail" type="email" value=""/></div>
+    <div class="f"><label>Parol</label><input id="apass" type="password" value="" onkeydown="if(event.key==='Enter')adminLogin()"/></div>
+    <button class="btn g w" style="height:50px;font-size:15px;border-radius:13px;margin-bottom:10px" onclick="adminLogin()">Kirish →</button>
+    <div style="text-align:center"><span style="color:var(--g);font-weight:700;cursor:pointer;font-size:13px" onclick="switchTo('L1')">← Orqaga</span></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ═══ ONBOARDING ═══ -->
+<div class="scr" id="S1">
+  <div class="obhead">
+    <div style="font-size:11px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px" id="obSlbl">QADAM 1 / 2</div>
+    <div style="font-size:21px;font-weight:800;margin-bottom:4px" id="obTitle">Profilingizni to'ldiring</div>
+    <div style="font-size:13px;opacity:.85" id="obSub">Ismingiz va aloqa ma'lumotlari</div>
+    <div class="obprog"><div class="obdot on" id="od1"></div><div class="obdot" id="od2"></div></div>
+  </div>
+  <div class="scroll" style="padding:18px">
+    <div id="OP1">
+      <div class="avup" onclick="document.getElementById('avf').click()" id="avup">
+        <span id="avtxt" style="font-size:28px">👤</span>
+        <div class="avlbl">Rasm</div>
+      </div>
+      <input type="file" id="avf" accept="image/*" class="hide" onchange="prevAv(this)"/>
+      <div class="f"><label>Ism Familya *</label><input id="oname" placeholder="Aziz Karimov"/></div>
+      <div class="f"><label>Telefon</label><input id="ophone" type="tel" placeholder="+998 90 123 45 67"/></div>
+      <div class="f" style="margin:0"><label>Email</label><input id="oemail" type="email" placeholder="email@gmail.com"/></div>
+    </div>
+    <div id="OP2" class="hide">
+      <div style="text-align:center;margin-bottom:18px"><div style="font-size:42px;margin-bottom:8px">🏢</div><div style="font-size:15px;font-weight:700;margin-bottom:2px">Korxona ma'lumotlari</div><div style="font-size:13px;color:var(--mu)">Buyurtmalar qayerga yetkazilsin?</div></div>
+      <div class="f"><label>Korxona / Restoran</label><input id="ocomp" placeholder="Aziz Restoran (ixtiyoriy)"/></div>
+      <div class="f"><label>Manzil *</label><textarea id="oaddr" placeholder="Shahar, ko'cha, uy, xonadon..."></textarea></div>
+      <div class="f" style="margin:0"><label>Izoh</label><input id="onote" placeholder="Darvoza, qo'ng'iroq..."/></div>
+    </div>
+  </div>
+  <div class="obfoot">
+    <div style="display:flex;gap:9px">
+      <button class="btn" id="obBack" style="display:none;min-width:100px" onclick="obGo(1)">← Orqaga</button>
+      <button class="btn g w" id="obNext" onclick="obNext()" style="height:50px;font-size:15px;border-radius:13px">Davom etish →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MIJOZ APP ═══ -->
+<div class="scr" id="S2">
+  <div class="nav">
+    <img id="lg2" style="height:30px;width:auto" alt="MyBox"/>
+    <div class="nav-r">
+      <button class="ico" onclick="goTab('cart')">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cbadge hide" id="cbadge">0</span>
+      </button>
+      <button class="ico" onclick="goTab('profile')">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll" id="cscroll">
+    <!-- HOME -->
+    <div class="pg on" id="T-home" style="padding-bottom:80px">
+      <div class="hero">
+        <div class="hero-badge">✦ AI Tavsiyalar</div>
+        <div class="hero-title" id="hgreet">Salom! Bugun nima kerak?</div>
+        <div class="hero-sub">Chegirmalar va yangi mahsulotlar</div>
+        <div class="ai-chips">
+          <span class="ac" onclick="aiRec('chegirma')">🏷️ Chegirmalar</span>
+          <span class="ac" onclick="aiRec('ommabop')">🔥 Ommabop</span>
+          <span class="ac" onclick="aiRec('arzon')">💡 Arzon</span>
+        </div>
+      </div>
+      <div id="aibox" style="margin-bottom:14px"></div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between">Xarajatlar<span style="font-size:11px;font-weight:400;color:var(--mu)">7 kun</span></div>
+        <div class="chart" id="xchart"></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);font-weight:600" id="xlbls"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="sv" id="xs1" style="font-size:14px">0</div><div class="sl">Jami xarajat</div></div>
+        <div class="stat"><div class="sv" id="xs2">0</div><div class="sl">Buyurtmalar</div></div>
+        <div class="stat"><div class="sv" id="xs3" style="font-size:14px;color:var(--g)">0</div><div class="sl">Tejaldi</div></div>
+        <div class="stat"><div class="sv" id="xs4">0</div><div class="sl">Faol obunalar</div></div>
+      </div>
+    </div>
+    <!-- BOXES -->
+    <div class="pg" id="T-boxes" style="padding-bottom:80px">
+      <div style="font-size:21px;font-weight:800;margin-bottom:3px">Tayyor Boxlar</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:16px">Bir marta tanlang, har gal yetkazamiz</div>
+      <div class="bgrid" id="bxgrid"></div>
+      <div id="bxdetail" class="hide"></div>
+    </div>
+    <!-- PRODUCTS -->
+    <div class="pg" id="T-products" style="padding-bottom:80px">
+      <div style="font-size:21px;font-weight:800;margin-bottom:12px">Mahsulotlar</div>
+      <div class="srch"><span class="si"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input placeholder="Qidirish..." oninput="filterP(this.value)"/></div>
+      <div class="cscroll" id="catrow" style="overflow-x:auto"></div>
+      <div class="pgrid" id="pgrid"></div>
+    </div>
+    <!-- CART -->
+    <div class="pg" id="T-cart" style="padding-bottom:80px">
+      <div style="font-size:21px;font-weight:800;margin-bottom:14px">Savat</div>
+      <div id="cempty" class="empty"><div class="eo">🛒</div><div class="et">Savat bo'sh</div><div class="es">Mahsulot yoki box tanlang</div></div>
+      <div id="ccont" class="hide">
+        <div id="citems"></div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:11px">Yetkazib berish</div>
+          <div class="f"><label>Manzil</label><input id="daddr" placeholder="Ko'cha, uy, xonadon"/></div>
+          <div class="f" style="margin:0"><label>Izoh</label><input id="dnote" placeholder="Qo'ng'iroq qiling..."/></div>
+        </div>
+        <div class="card">
+          <div class="sr"><span>Mahsulotlar</span><span id="csub">—</span></div>
+          <div class="sr"><span>Xizmat haqi (3%)</span><span id="cfee">—</span></div>
+          <div class="sr"><span>Yetkazib berish</span><span style="color:var(--g);font-weight:700">Bepul</span></div>
+          <div class="stot"><span>Jami</span><span style="color:var(--g)" id="ctot">—</span></div>
+          <div class="pnote">💵 <strong>Naqd pul</strong> — yetkazib berganda to'lanadi</div>
+        </div>
+        <button class="btn g w" style="height:50px;font-size:15px;border-radius:13px;margin-top:4px" onclick="openOvl()">Buyurtma berish →</button>
+      </div>
+    </div>
+    <!-- ORDERS -->
+    <div class="pg" id="T-orders" style="padding-bottom:80px">
+      <div style="font-size:21px;font-weight:800;margin-bottom:3px">Buyurtmalar</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:16px">Barcha buyurtmalar tarixi</div>
+      <div id="ordlist"></div>
+    </div>
+    <!-- PROFILE -->
+    <div class="pg" id="T-profile" style="padding-bottom:80px">
+      <div class="ptop">
+        <div class="pav" id="pav" onclick="document.getElementById('pavf').click()"><span id="pavtxt" style="font-size:28px">👤</span></div>
+        <input type="file" id="pavf" accept="image/*" class="hide" onchange="changePAv(this)"/>
+        <div style="font-size:18px;font-weight:800" id="pname">—</div>
+        <div style="font-size:13px;color:var(--mu);margin-top:2px" id="pcont">—</div>
+      </div>
+      <div class="tabbar">
+        <button class="tabbtn on" onclick="ptab('i',this)">Ma'lumotlar</button>
+        <button class="tabbtn" onclick="ptab('h',this)">Buyurtmalar</button>
+      </div>
+      <div id="pinfo">
+        <div class="card">
+          <div class="f"><label>Ism Familya</label><input id="prn"/></div>
+          <div class="f"><label>Telefon</label><input id="prp" type="tel"/></div>
+          <div class="f"><label>Email</label><input id="pre" type="email"/></div>
+          <div class="f"><label>Korxona / Restoran</label><input id="prc"/></div>
+          <div class="f" style="margin:0"><label>Manzil</label><textarea id="pra"></textarea></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn g" style="flex:1;height:46px;border-radius:13px" onclick="saveProf()">Saqlash</button>
+          <button class="btn red" style="height:46px;border-radius:13px" onclick="logout()">Chiqish</button>
+        </div>
+      </div>
+      <div id="phist" class="hide"></div>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <button class="bni on" onclick="goTab('home')" id="bn-home"><div class="bni-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Bosh</button>
+    <button class="bni" onclick="goTab('boxes')" id="bn-boxes"><div class="bni-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Boxlar</button>
+    <button class="bni" onclick="goTab('products')" id="bn-products"><div class="bni-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Mahsulotlar</button>
+    <button class="bni" onclick="goTab('orders')" id="bn-orders"><div class="bni-dot"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/></svg>Tarix</button>
+  </div>
+</div>
+
+<!-- ═══ ADMIN APP ═══ -->
+<div class="scr" id="S3">
+  <div class="nav">
+    <img id="lg3" style="height:28px;width:auto" alt="MyBox"/>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;font-weight:700;color:var(--mu)">Admin</span>
+      <button class="btn sm red" onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+  <div class="atabs">
+    <button class="atab on" onclick="aTab('dash',this)">Dashboard</button>
+    <button class="atab" onclick="aTab('prods',this)">Mahsulotlar</button>
+    <button class="atab" onclick="aTab('boxes',this)">Boxlar</button>
+    <button class="atab" onclick="aTab('orders',this)">Buyurtmalar</button>
+    <button class="atab" onclick="aTab('cats',this)">Kategoriyalar</button>
+  </div>
+  <div class="acont" id="acont"><div class="ld"><div class="spin"></div>Yuklanmoqda...</div></div>
+</div>
+
+<!-- ORDER SHEET -->
+<div class="ov" id="OV1" onclick="if(event.target===this)closeOvl()">
+<div class="sheet">
+  <div class="hdl"></div>
+  <div class="st">Buyurtma sozlamalari</div>
+  <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">Yetkazib berish chastotasi</div>
+  <div class="fgrid">
+    <button class="fbtn on" onclick="setFreq('once',this)"><span class="fn">Bir martalik</span><span class="fd">Faqat shu safar</span></button>
+    <button class="fbtn" onclick="setFreq('daily',this)"><span class="fn">Har kuni</span><span class="fd">Kunlik</span></button>
+    <button class="fbtn" onclick="setFreq('2days',this)"><span class="fn">Har 2 kunda</span><span class="fd">2 kunda bir</span></button>
+    <button class="fbtn" onclick="setFreq('3days',this)"><span class="fn">Har 3 kunda</span><span class="fd">3 kunda bir</span></button>
+    <button class="fbtn" onclick="setFreq('weekly',this)"><span class="fn">Haftalik</span><span class="fd">Haftada bir</span></button>
+    <button class="fbtn" onclick="setFreq('monthly',this)"><span class="fn">Oylik</span><span class="fd">Oyda bir</span></button>
+  </div>
+  <div class="dv"></div>
+  <div class="f"><label>Manzil</label><input id="oaddr" placeholder="Ko'cha, uy, xonadon"/></div>
+  <div class="f"><label>Izoh</label><input id="onote" placeholder="Qo'ng'iroq qiling..."/></div>
+  <div class="dv"></div>
+  <div class="sr"><span>Mahsulotlar</span><span id="osub">—</span></div>
+  <div class="sr"><span>Xizmat haqi (3%)</span><span id="ofee">—</span></div>
+  <div class="sr"><span>Yetkazib berish</span><span style="color:var(--g);font-weight:700">Bepul</span></div>
+  <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding-top:9px;border-top:1px solid var(--bd);margin:6px 0 13px"><span>Jami</span><span style="color:var(--g)" id="otot">—</span></div>
+  <div class="pnote" style="margin-bottom:13px">💵 <strong>Naqd pul</strong> — yetkazib berganda to'lanadi</div>
+  <button class="btn g w" style="height:50px;font-size:15px;border-radius:13px" onclick="confirmOrder()">✓ Tasdiqlash</button>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="ov" id="OV2" onclick="if(event.target===this)closeMod()">
+<div class="sheet" id="mbox" style="max-height:92vh">
+  <div class="hdl"></div>
+  <div class="st" id="mtitle">—</div>
+  <div id="mbody"></div>
+</div>
+</div>
+
+<script>
+// ═══ SUPABASE ═══
+const SB = supabase.createClient(
+  'https://tgtvnlbfypabarmalsed.supabase.co',
+  'sb_publishable_ZnD8xG_9xT1tQMfqSGlODg_jv_mnRQI'
+);
+
+// ═══ LOGO ═══
+const LOGO = 'data:image/jpeg;base64,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';
+document.querySelectorAll('[id^=lg]').forEach(el => el.src = LOGO);
+
+// ═══ UTILS ═══
+const G = k => { try { return JSON.parse(localStorage.getItem('mb_'+k)||'null'); } catch(e) { localStorage.removeItem('mb_'+k); return null; } };
+const S = (k,v) => localStorage.setItem('mb_'+k, JSON.stringify(v));
+const fm = n => Math.round(n||0).toLocaleString('uz-UZ') + " so'm";
+const uid = () => Math.random().toString(36).slice(2,8).toUpperCase();
+const fz = (q,u) => q && u ? q+' '+u : (u||'');
+const dt = () => new Date().toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const UNITS = ['g','kg','mg','ml','l','cl','dona','quti','paket',"bog'lam"];
+const uopts = (s='g') => UNITS.map(u=>`<option value="${u}"${s===u?' selected':''}>${u}</option>`).join('');
+
+function toast(msg, tp='ok') {
+  const c = {ok:'#16a34a', err:'#dc2626', warn:'#d97706'};
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span class="tdot" style="background:${c[tp]||c.ok}"></span>${msg}`;
+  document.getElementById('TR').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function showScr(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+
+// ═══ LOGIN ═══
+function switchTo(id) {
+  ['L1','L2','LA'].forEach(x => document.getElementById(x).classList.add('hide'));
+  document.getElementById(id).classList.remove('hide');
+}
+
+function autoFillPhone() {
+  const saved = G('phone');
+  if (saved) {
+    document.getElementById('lphone').value = saved;
+  }
+}
+
+function sendOtp() {
+  const phone = document.getElementById('lphone').value.trim();
+  if (!phone) { toast('Telefon raqam kiriting', 'err'); return; }
+  document.getElementById('otpLabel').textContent = phone + ' raqamiga kod yuborildi';
+  document.getElementById('lotp').value = '';
+  switchTo('L2');
+  toast('Demo: istalgan 6 raqam kiriting');
+}
+
+async function verifyOtp() {
+  const otp = document.getElementById('lotp').value.trim();
+  if (otp.length !== 6) { toast('6 raqam kiriting', 'err'); return; }
+  const phone = document.getElementById('lphone').value.trim();
+  
+  // Show loading
+  const btn = document.querySelector('#L2 .btn');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  
+  try {
+    // Telefon bo'yicha mijozni Supabase dan izlash
+    const { data, error } = await SB.from('clients').select('*').eq('contact', phone);
+    
+    if (error) throw error;
+    
+    if (data && data.length > 0) {
+      // Mavjud mijoz — Supabase dagi eng yangi ma'lumotni olamiz
+      const client = data[0];
+      S('client', client);
+      S('sess', 'client');
+      S('phone', phone);
+      toast('Xush kelibsiz, ' + (client.name || 'Mijoz') + '! 👋');
+      if (client.name && client.address) { startClient(); }
+      else { startOnboard(); }
+    } else {
+      // Yangi mijoz — Supabase ga qo'shamiz
+      const { data: nc, error: ne } = await SB.from('clients').insert({ contact: phone }).select().single();
+      if (ne) throw ne;
+      S('client', nc || { contact: phone });
+      S('sess', 'client');
+      S('phone', phone);
+      startOnboard();
+    }
+  } catch(e) {
+    S('client', { contact: phone });
+    S('sess', 'client');
+    S('phone', phone);
+    startOnboard();
+  } finally {
+    if (btn) { btn.textContent = 'Kirish'; btn.disabled = false; }
+  }
+}
+
+async function adminLogin() {
+  const e = document.getElementById('aemail').value.trim();
+  const p = document.getElementById('apass').value;
+  if (!e || !p) { toast('Email va parol kiriting', 'err'); return; }
+  try {
+    const { data } = await SB.from('admin_config').select('*');
+    const cfg = {};
+    (data||[]).forEach(r => cfg[r.key] = r.value);
+    const ce = cfg['email'] || '883228898';
+    const cp = cfg['password'] || 'Fatxulla8898';
+    if (e === ce && p === cp) {
+      S('sess', 'admin'); showScr('S3'); loadDash();
+      toast('Admin paneliga xush kelibsiz! 🎉');
+    } else {
+      toast('Email yoki parol xato', 'err');
+    }
+  } catch(err) {
+    if (e === 'admin@mybox.uz' && p === 'admin123') {
+      S('sess', 'admin'); showScr('S3'); loadDash();
+      toast('Admin paneliga xush kelibsiz! 🎉');
+    } else {
+      toast('Email yoki parol xato', 'err');
+    }
+  }
+}
+
+function logout() {
+  S('sess', null); S('client', null);
+  cart = [];
+  document.getElementById('lphone').value = '';
+  document.getElementById('lotp').value = '';
+  switchTo('L1');
+  showScr('S0');
+}
+
+// ═══ ONBOARDING ═══
+let obStep = 1;
+
+function startOnboard() {
+  showScr('S1');
+  obGo(1);
+}
+
+function obGo(n) {
+  obStep = n;
+  const u = G('client') || {};
+  if (n === 1) {
+    document.getElementById('oname').value = u.name || '';
+    document.getElementById('ophone').value = u.phone || u.contact || '';
+    document.getElementById('oemail').value = u.email || '';
+  } else {
+    document.getElementById('ocomp').value = u.company || '';
+    document.getElementById('oaddr').value = u.address || '';
+    document.getElementById('onote').value = u.note || '';
+  }
+  document.getElementById('OP1').classList.toggle('hide', n !== 1);
+  document.getElementById('OP2').classList.toggle('hide', n !== 2);
+  document.getElementById('obSlbl').textContent = `QADAM ${n} / 2`;
+  document.getElementById('obTitle').textContent = n === 1 ? "Profilingizni to'ldiring" : 'Yetkazib berish manzili';
+  document.getElementById('obSub').textContent = n === 1 ? "Ismingiz va aloqa ma'lumotlari" : "Buyurtmalaringiz qayerga yetkazilsin?";
+  document.getElementById('od1').classList.toggle('on', n >= 1);
+  document.getElementById('od2').classList.toggle('on', n >= 2);
+  document.getElementById('obBack').style.display = n > 1 ? '' : 'none';
+  document.getElementById('obNext').textContent = n === 2 ? 'Boshlash 🚀' : 'Davom etish →';
+}
+
+function prevAv(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    window._av = e.target.result;
+    document.getElementById('avup').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"><div class="avlbl">O'zgartirish</div>`;
+  };
+  r.readAsDataURL(f);
+}
+
+async function obNext() {
+  if (obStep === 1) {
+    const name = document.getElementById('oname').value.trim();
+    const phone = document.getElementById('ophone').value.trim();
+    if (!name) { toast('Ismingizni kiriting', 'err'); return; }
+    if (!phone) { toast('Telefon raqamingizni kiriting', 'err'); return; }
+    obGo(2);
+  } else {
+    const addr = document.getElementById('oaddr').value.trim();
+    if (!addr) { toast('Manzilni kiriting', 'err'); return; }
+    const u = G('client') || {};
+    const upd = {
+      name: document.getElementById('oname').value.trim(),
+      phone: document.getElementById('ophone').value.trim(),
+      email: document.getElementById('oemail').value.trim(),
+      company: document.getElementById('ocomp').value.trim(),
+      address: addr,
+      note: document.getElementById('onote').value.trim(),
+    };
+    if (window._av) upd.avatar_url = window._av;
+    try {
+      let saved;
+      if (u.id) {
+        const { data } = await SB.from('clients').update(upd).eq('id', u.id).select().single();
+        saved = data;
+      } else if (u.contact) {
+        const { data } = await SB.from('clients').update(upd).eq('contact', u.contact).select().single();
+        saved = data;
+        if (!saved) {
+          const { data: ins } = await SB.from('clients').insert({ ...upd, contact: u.contact }).select().single();
+          saved = ins;
+        }
+      }
+      S('client', saved || { ...u, ...upd });
+    } catch(e) {
+      S('client', { ...u, ...upd });
+    }
+    startClient();
+  }
+}
+
+// ═══ MIJOZ APP ═══
+let cart = [], allProds = [], filtCat = '', filtSrch = '', freq = 'once';
+
+function startClient() {
+  cart = G('cart') || [];
+  const u = G('client') || {};
+  showScr('S2');
+  updateBadge();
+  if (u.name) {
+    document.getElementById('hgreet').textContent = 'Salom, ' + u.name + '! 👋';
+    document.getElementById('pavtxt').textContent = u.name[0].toUpperCase();
+  }
+  if (u.avatar_url) document.getElementById('pav').innerHTML = `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover">`;
+  document.getElementById('pname').textContent = u.name || '—';
+  document.getElementById('pcont').textContent = u.phone || u.contact || '—';
+  document.getElementById('prn').value = u.name || '';
+  document.getElementById('prp').value = u.phone || '';
+  document.getElementById('pre').value = u.email || '';
+  document.getElementById('prc').value = u.company || '';
+  document.getElementById('pra').value = u.address || '';
+  if (u.address) document.getElementById('daddr').value = u.address;
+  goTab('home');
+  loadHome();
+  loadBoxes();
+  loadProducts();
+  loadOrders();
+  setTimeout(() => aiRec('chegirma'), 300);
+}
+
+function goTab(t) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.bni').forEach(b => b.classList.remove('on'));
+  document.getElementById('T-' + t).classList.add('on');
+  const bn = document.getElementById('bn-' + t);
+  if (bn) bn.classList.add('on');
+  document.getElementById('cscroll').scrollTop = 0;
+  if (t === 'cart') renderCart();
+  if (t === 'orders') loadOrders();
+  if (t === 'home') loadHome();
+}
+
+function ptab(t, el) {
+  document.querySelectorAll('.tabbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('pinfo').classList.toggle('hide', t !== 'i');
+  document.getElementById('phist').classList.toggle('hide', t !== 'h');
+  if (t === 'h') loadProfHist();
+}
+
+async function loadHome() {
+  const u = G('client') || {};
+  if (!u.id) { renderChart([]); return; }
+  const { data } = await SB.from('orders').select('*').eq('client_id', u.id);
+  const o = data || [];
+  const tot = o.reduce((s,x) => s+(x.total||0), 0);
+  const sav = o.reduce((s,x) => s+(x.saved||0), 0);
+  const act = o.filter(x => x.freq!=='once' && x.status!=='DELIVERED' && x.status!=='CANCELLED').length;
+  document.getElementById('xs1').textContent = tot > 0 ? Math.round(tot/1000)+'k so\'m' : '0';
+  document.getElementById('xs2').textContent = o.length;
+  document.getElementById('xs3').textContent = sav > 0 ? Math.round(sav/1000)+'k so\'m' : '0';
+  document.getElementById('xs4').textContent = act;
+  renderChart(o);
+}
+
+function renderChart(ords) {
+  const vals = [], lbls = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().split('T')[0];
+    lbls.push((d.getMonth()+1)+'/'+(d.getDate()));
+    vals.push(ords.filter(o => o.created_at && o.created_at.startsWith(ds)).reduce((s,o) => s+(o.total||0), 0));
+  }
+  const mx = Math.max(...vals, 1);
+  document.getElementById('xchart').innerHTML = vals.map(v => `<div class="bc"><div class="b${v===mx&&v>0?' hi':''}" style="height:${Math.max(4,Math.round(v/mx*72))}px"></div></div>`).join('');
+  document.getElementById('xlbls').innerHTML = lbls.map(l => `<span>${l}</span>`).join('');
+}
+
+async function aiRec(type) {
+  const el = document.getElementById('aibox');
+  const { data: prods } = await SB.from('products').select('*').eq('is_active', true);
+  if (!prods || !prods.length) {
+    el.innerHTML = '<div style="text-align:center;padding:14px;background:#fff;border:1px solid var(--bd);border-radius:13px;color:var(--mu);font-size:13px">Admin mahsulot qo\'shgach AI tavsiyalar ko\'rinadi 🤖</div>';
+    return;
+  }
+  let list = [], title = '';
+  if (type === 'chegirma') { title='🏷️ Chegirmali'; list=prods.filter(p=>p.discount>0).slice(0,4); if(!list.length){title='📦 Mahsulotlar';list=prods.slice(0,4);} }
+  else if (type === 'ommabop') { title='🔥 Mashhur'; list=prods.slice(0,4); }
+  else { title='💡 Arzon'; list=[...prods].sort((a,b)=>a.price-b.price).slice(0,4); }
+  el.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:7px">${title}</div>` +
+    list.map(p => `<div class="ai-item">
+      <div class="ai-img">${p.image_url ? `<img src="${p.image_url}">` : (p.emoji||'📦')}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--g);margin-top:1px">${fm(p.price)}<span style="font-size:10px;color:var(--mu);font-weight:400"> / ${fz(p.size_qty,p.size_unit)||'dona'}</span>${p.discount>0?`<span style="background:#fef3c7;color:#92400e;border-radius:100px;font-size:10px;font-weight:700;padding:1px 6px;margin-left:4px">-${p.discount}%</span>`:''}</div>
+      </div>
+      <button class="add-ai" onclick="addP('${p.id}')">+</button>
+    </div>`).join('');
+}
+
+async function loadBoxes() {
+  const { data: boxes } = await SB.from('boxes').select('*').order('created_at', {ascending:false});
+  const el = document.getElementById('bxgrid');
+  const icons = ['📦','🥩','🥗','🥛','🌾','🍎','🧴','🥦'];
+  if (!boxes || !boxes.length) {
+    el.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="eo">📭</div><div class="et">Boxlar yo'q</div><div class="es">Admin boxlar qo'shgach ko'rinadi</div></div>`;
+    return;
+  }
+  el.innerHTML = boxes.map((b,i) => `
+    <div class="bcard" onclick="viewBox('${b.id}')">
+      <div class="bico">${icons[i%icons.length]}</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:2px">${b.name}</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:7px">${(b.items||[]).length} ta mahsulot</div>
+      <div style="font-size:15px;font-weight:800;color:var(--g)">${fm(b.price)}</div>
+    </div>`).join('');
+}
+
+async function viewBox(id) {
+  const { data: b } = await SB.from('boxes').select('*').eq('id', id).single();
+  if (!b) return;
+  const { data: prods } = await SB.from('products').select('*');
+  const el = document.getElementById('bxdetail');
+  el.classList.remove('hide');
+  el.innerHTML = `<div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:12px">${b.name} — tarkib</div>
+    ${(b.items||[]).map(it => {
+      const p = (prods||[]).find(x => x.id===it.pid);
+      return p ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px">
+        <span>${p.name}${p.size_qty?` <span style="font-size:10px;color:var(--mu)">(${fz(p.size_qty,p.size_unit)})</span>`:''}</span>
+        <span style="color:var(--mu)">${it.qty}× · ${fm(p.price*it.qty)}</span>
+      </div>` : '';
+    }).join('')}
+    <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;padding-top:9px"><span>Jami</span><span style="color:var(--g)">${fm(b.price)}</span></div>
+    <button class="btn g w" style="margin-top:12px;height:48px;border-radius:13px" onclick="addBox('${b.id}','${b.name.replace(/'/g,"\\'")}',${b.price})">Savatga qo'shish →</button>
+  </div>`;
+  el.scrollIntoView({behavior:'smooth'});
+}
+
+function addBox(id, name, price) {
+  cart.push({id:'bx_'+uid(), ref:id, type:'box', name, price:+price, qty:1, unit:'box', emo:'📦'});
+  S('cart', cart); updateBadge();
+  toast(name + " savatga qo'shildi ✓");
+  document.getElementById('bxdetail').classList.add('hide');
+}
+
+async function loadProducts() {
+  const [{ data: cats }, { data: prods }] = await Promise.all([
+    SB.from('categories').select('*').order('name'),
+    SB.from('products').select('*').eq('is_active', true).order('name')
+  ]);
+  allProds = prods || [];
+  document.getElementById('catrow').innerHTML =
+    `<button class="cpill${!filtCat?' on':''}" onclick="setCat('')">Barchasi</button>` +
+    (cats||[]).map(c => `<button class="cpill${filtCat===c.id?' on':''}" onclick="setCat('${c.id}')">${c.name}</button>`).join('');
+  renderProds();
+}
+
+function setCat(id) {
+  filtCat = id;
+  document.querySelectorAll('.cpill').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('.cpill').forEach(c => { if(c.getAttribute('onclick')===`setCat('${id}')`) c.classList.add('on'); });
+  renderProds();
+}
+function filterP(v) { filtSrch = v; renderProds(); }
+
+function renderProds() {
+  let p = allProds;
+  if (filtCat) p = p.filter(x => x.category_id === filtCat);
+  if (filtSrch) p = p.filter(x => (x.name||'').toLowerCase().includes(filtSrch.toLowerCase()));
+  const g = document.getElementById('pgrid');
+  if (!p.length) { g.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="eo">🔍</div><div class="et">Topilmadi</div></div>`; return; }
+  g.innerHTML = p.map(x => {
+    const ci = cart.find(c => c.ref===x.id || c.id===x.id);
+    const q = ci ? ci.qty : 0;
+    const sz = fz(x.size_qty, x.size_unit);
+    return `<div class="pc">
+      <div class="pimg">${x.image_url ? `<img src="${x.image_url}">` : (x.emoji||'📦')}${x.discount>0 ? `<div class="dtag">-${x.discount}%</div>` : ''}</div>
+      <div class="pbody">
+        <div class="pname">${x.name}</div>
+        <div class="pcat">${x.category_name||''}${sz?` · <b>${sz}</b>`:''}</div>
+        <div class="pfoot">
+          <div><div class="pprice">${fm(x.price)}</div><div style="font-size:10px;color:var(--mu)">1 ta uchun</div></div>
+          ${q > 0
+            ? `<div class="qctrl"><button class="qb" onclick="chQ('${x.id}',-1)">−</button><span class="qn">${q}</span><button class="qb" onclick="chQ('${x.id}',1)">+</button></div>`
+            : `<button class="addbtn" onclick="addP('${x.id}')">+</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addP(id) {
+  const p = allProds.find(x => x.id===id); if (!p) return;
+  const ex = cart.find(c => c.ref===id || c.id===id);
+  if (ex) ex.qty++;
+  else cart.push({id, ref:id, type:'prod', name:p.name, price:p.price, qty:1, unit:fz(p.size_qty,p.size_unit)||p.size_unit||'dona', img:p.image_url, emo:p.emoji});
+  S('cart', cart); updateBadge(); renderProds();
+  toast(p.name + " qo'shildi");
+}
+
+function chQ(id, d) {
+  const i = cart.findIndex(c => c.ref===id || c.id===id); if (i<0) return;
+  cart[i].qty += d;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  S('cart', cart); updateBadge(); renderProds();
+  if (document.getElementById('T-cart').classList.contains('on')) renderCart();
+}
+
+function updateBadge() {
+  const n = cart.reduce((s,i) => s+i.qty, 0);
+  const el = document.getElementById('cbadge');
+  el.classList.toggle('hide', n===0);
+  el.textContent = n>9 ? '9+' : n;
+}
+
+function renderCart() {
+  const empty = document.getElementById('cempty');
+  const cont = document.getElementById('ccont');
+  if (!cart.length) { empty.classList.remove('hide'); cont.classList.add('hide'); return; }
+  empty.classList.add('hide'); cont.classList.remove('hide');
+  let sub = cart.reduce((s,i) => s+i.price*i.qty, 0);
+  const fee = Math.round(sub*.03);
+  document.getElementById('citems').innerHTML = cart.map(i => `
+    <div class="ci">
+      <div class="cimg">${i.img ? `<img src="${i.img}">` : (i.emo||'📦')}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.name}</div>
+        <div style="font-size:10px;color:var(--mu)">${i.unit||''}</div>
+        <div style="font-size:12px;font-weight:800;color:var(--g);margin-top:2px">${fm(i.price*i.qty)}</div>
+      </div>
+      <div class="qctrl">
+        <button class="qb" onclick="chQC('${i.id}',-1)">−</button>
+        <span class="qn">${i.qty}</span>
+        <button class="qb" onclick="chQC('${i.id}',1)">+</button>
+      </div>
+      <button class="delbtn" onclick="delC('${i.id}')">✕</button>
+    </div>`).join('');
+  document.getElementById('csub').textContent = fm(sub);
+  document.getElementById('cfee').textContent = fm(fee);
+  document.getElementById('ctot').textContent = fm(sub+fee);
+}
+
+function chQC(id, d) {
+  const i = cart.findIndex(c => c.id===id); if (i<0) return;
+  cart[i].qty += d;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  S('cart', cart); updateBadge(); renderCart(); renderProds();
+}
+
+function delC(id) {
+  cart = cart.filter(i => i.id!==id);
+  S('cart', cart); updateBadge(); renderCart();
+}
+
+function openOvl() {
+  if (!cart.length) { toast("Savat bo'sh", 'err'); return; }
+  document.getElementById('oaddr').value = document.getElementById('daddr').value;
+  let sub = cart.reduce((s,i) => s+i.price*i.qty, 0);
+  const fee = Math.round(sub*.03);
+  document.getElementById('osub').textContent = fm(sub);
+  document.getElementById('ofee').textContent = fm(fee);
+  document.getElementById('otot').textContent = fm(sub+fee);
+  document.getElementById('OV1').classList.add('on');
+}
+
+function closeOvl() { document.getElementById('OV1').classList.remove('on'); }
+function setFreq(f, el) { freq=f; document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+
+async function confirmOrder() {
+  const addr = document.getElementById('oaddr').value.trim();
+  if (!addr) { toast('Manzil kiriting', 'err'); return; }
+  let sub = cart.reduce((s,i) => s+i.price*i.qty, 0);
+  const fee = Math.round(sub*.03);
+  const fl = {once:'Bir martalik',daily:'Har kuni','2days':'Har 2 kunda','3days':'Har 3 kunda',weekly:'Haftalik',monthly:'Oylik'};
+  const savedDisc = cart.reduce((s,i) => { const p=allProds.find(x=>x.id===i.ref||x.id===i.id); return s+(p&&p.discount>0?Math.round(p.price*i.qty*p.discount/100):0); }, 0);
+  
+  // Mijoz ma'lumotlarini Supabase dan yangilab olamiz
+  let u = G('client') || {};
+  const contact = u.contact || u.phone || '';
+  if (contact && !u.id) {
+    try {
+      const { data: fresh } = await SB.from('clients').select('*').eq('contact', contact);
+      if (fresh && fresh.length > 0) {
+        u = fresh[0];
+        S('client', u);
+      }
+    } catch(e) {}
+  }
+  
+  const ord = {
+    id: uid(), status: 'PENDING',
+    client_id: u.id || null,
+    client_name: u.name || u.phone || u.contact || "Noma'lum",
+    client_phone: u.phone || u.contact || '',
+    items: cart, freq, freq_label: fl[freq]||'Bir martalik',
+    address: addr,
+    note: document.getElementById('onote').value,
+    subtotal: sub, fee, total: sub+fee, saved: savedDisc
+  };
+  const { error } = await SB.from('orders').insert(ord);
+  if (error) { toast('Xatolik! Qayta urining', 'err'); return; }
+  cart = []; S('cart', []); updateBadge();
+  closeOvl(); renderCart(); loadOrders(); loadHome();
+  goTab('orders');
+  toast('Buyurtma qabul qilindi! #'+ord.id+' 🎉');
+}
+
+async function loadOrders() {
+  const u = G('client') || {};
+  const el = document.getElementById('ordlist');
+  el.innerHTML = '<div class="ld"><div class="spin"></div>Yuklanmoqda...</div>';
+  
+  let orders = [];
+  try {
+    // 1. id bo'yicha izlash
+    if (u.id) {
+      const { data } = await SB.from('orders').select('*').eq('client_id', u.id).order('created_at', {ascending:false});
+      orders = data || [];
+    }
+    // 2. Telefon bo'yicha izlash
+    if (!orders.length) {
+      const phone = u.phone || u.contact || '';
+      if (phone) {
+        const { data } = await SB.from('orders').select('*').eq('client_phone', phone).order('created_at', {ascending:false});
+        orders = data || [];
+      }
+    }
+    // 3. Ism bo'yicha izlash
+    if (!orders.length && u.name) {
+      const { data } = await SB.from('orders').select('*').eq('client_name', u.name).order('created_at', {ascending:false});
+      orders = data || [];
+    }
+  } catch(e) {
+    orders = [];
+  }
+  
+  if (!orders.length) {
+    el.innerHTML='<div class="empty"><div class="eo">📋</div><div class="et">Buyurtmalar yo'q</div><div class="es">Mahsulot yoki box tanlang</div></div>';
+    return;
+  }
+  const data = orders;
+  const o = data;
+  const sl = {PENDING:'Kutilmoqda',ACCEPTED:'Qabul qilindi',PREPARING:'Tayyorlanmoqda',DELIVERED:'Yetkazildi',CANCELLED:'Bekor'};
+  const sc = {PENDING:'by',ACCEPTED:'bb',PREPARING:'bp',DELIVERED:'bg',CANCELLED:'br'};
+  el.innerHTML = o.length ? o.map(x => `
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:14px;padding:13px;margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+        <div>
+          <div style="font-weight:800;font-size:14px">#${x.id}</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">${x.created_at?new Date(x.created_at).toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:800;color:var(--g);font-size:14px">${fm(x.total)}</div>
+          <div style="display:flex;gap:3px;margin-top:4px;justify-content:flex-end;flex-wrap:wrap">
+            <span class="badge ${sc[x.status]||'bmu'}">${sl[x.status]||x.status}</span>
+            <span class="badge bmu">${x.freq_label||'Bir martalik'}</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:3px">${(x.items||[]).map(i=>i.name+'×'+i.qty).join(' · ')}</div>
+      ${x.address?`<div style="font-size:11px;color:var(--mu)">📍 ${x.address}</div>`:''}
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:7px;padding-top:7px;border-top:1px solid var(--bd)">
+        <span>Xizmat: ${fm(x.fee)}</span><span style="color:var(--g);font-weight:700">💵 Naqd</span>
+      </div>
+    </div>`).join('')
+  : `<div class="empty"><div class="eo">📋</div><div class="et">Buyurtmalar yo'q</div><div class="es">Mahsulot yoki box tanlang</div></div>`;
+}
+
+async function loadProfHist() {
+  const u = G('client') || {};
+  let data = [];
+  if (u.id) {
+    const { data: d } = await SB.from('orders').select('id,total,created_at,status').eq('client_id', u.id).order('created_at',{ascending:false}).limit(8);
+    data = d || [];
+  }
+  if (!data.length && u.name) {
+    const { data: d2 } = await SB.from('orders').select('id,total,created_at,status').eq('client_name', u.name).order('created_at',{ascending:false}).limit(8);
+    data = d2 || [];
+  }
+  {
+  document.getElementById('phist').innerHTML = (data||[]).length
+    ? (data||[]).map(x => `<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)"><div><div style="font-weight:700;font-size:13px">#${x.id}</div><div style="font-size:11px;color:var(--mu)">${x.created_at?new Date(x.created_at).toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit'}):''}</div></div><div style="font-weight:800;color:var(--g)">${fm(x.total)}</div></div>`).join('')
+    : '<p style="text-align:center;color:var(--mu);padding:20px">Buyurtmalar yo\'q</p>';
+}
+
+async function saveProf() {
+  const u = G('client') || {};
+  const upd = {
+    name: document.getElementById('prn').value.trim(),
+    phone: document.getElementById('prp').value,
+    email: document.getElementById('pre').value,
+    company: document.getElementById('prc').value,
+    address: document.getElementById('pra').value,
+  };
+  try {
+    let saved;
+    if (u.id) {
+      const { data } = await SB.from('clients').update(upd).eq('id', u.id).select().single();
+      saved = data;
+    } else if (u.contact) {
+      const { data } = await SB.from('clients').update(upd).eq('contact', u.contact).select().single();
+      saved = data;
+    }
+    S('client', saved || {...u,...upd});
+  } catch(e) {
+    S('client', {...u,...upd});
+  }
+  document.getElementById('pname').textContent = upd.name || '—';
+  document.getElementById('pcont').textContent = upd.phone || '—';
+  if (upd.name) document.getElementById('hgreet').textContent = 'Salom, '+upd.name+'! 👋';
+  if (upd.address) document.getElementById('daddr').value = upd.address;
+  toast('Profil saqlandi ✓');
+}
+
+function changePAv(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = async e => {
+    const u = G('client') || {};
+    u.avatar_url = e.target.result;
+    S('client', u);
+    if (u.id) { try { await SB.from('clients').update({avatar_url:u.avatar_url}).eq('id',u.id); } catch(err){} }
+    document.getElementById('pav').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+    toast('Rasm saqlandi ✓');
+  };
+  r.readAsDataURL(f);
+}
+
+// ═══ ADMIN ═══
+function aTab(t, el) {
+  document.querySelectorAll('.atab').forEach(x => x.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('acont').innerHTML = '<div class="ld"><div class="spin"></div>Yuklanmoqda...</div>';
+  if (t==='dash') loadDash();
+  else if (t==='prods') loadAProds();
+  else if (t==='boxes') loadABoxes();
+  else if (t==='orders') loadAOrds();
+  else if (t==='cats') loadACats();
+}
+
+async function loadDash() {
+  const [{ data: ords }, { data: prods }] = await Promise.all([
+    SB.from('orders').select('*').order('created_at', {ascending:false}),
+    SB.from('products').select('id')
+  ]);
+  const o = ords || [];
+  const rev = o.reduce((s,x) => s+(x.total||0), 0);
+  const pend = o.filter(x => x.status==='PENDING').length;
+  const sl = {PENDING:'Kutilmoqda',ACCEPTED:'Qabul',PREPARING:'Tayyor',DELIVERED:'Yetkazildi',CANCELLED:'Bekor'};
+  document.getElementById('acont').innerHTML = `
+    <div class="stats">
+      <div class="stat"><div class="sv">${o.length}</div><div class="sl">Buyurtmalar</div></div>
+      <div class="stat"><div class="sv" style="${pend>0?'color:#d97706':''}">${pend}</div><div class="sl">Kutilayotgan</div></div>
+      <div class="stat"><div class="sv">${(prods||[]).length}</div><div class="sl">Mahsulotlar</div></div>
+      <div class="stat"><div class="sv" style="font-size:13px">${Math.round(rev/1000)}k</div><div class="sl">Tushum so'm</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">So'nggi buyurtmalar</div>
+      ${o.slice(0,6).map(x => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">
+          <div>
+            <div style="font-weight:700;font-size:13px">#${x.id} <span style="font-weight:400;color:var(--mu);font-size:11px">· ${x.client_name||'—'}</span></div>
+            <div style="font-size:10px;color:var(--mu)">${x.created_at?new Date(x.created_at).toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-weight:800;color:var(--g);font-size:13px">${fm(x.total)}</span>
+            <select style="height:26px;border-radius:7px;font-size:11px;padding:0 5px;border:1px solid var(--bd);font-family:inherit" onchange="updOrdStatus('${x.id}',this.value)">
+              ${['PENDING','ACCEPTED','PREPARING','DELIVERED','CANCELLED'].map(s=>`<option value="${s}"${x.status===s?' selected':''}>${sl[s]}</option>`).join('')}
+            </select>
+          </div>
+        </div>`).join('') || '<p style="color:var(--mu);padding:10px 0;font-size:13px">Buyurtmalar yo\'q</p>'}
+    </div>`;
+}
+
+async function updOrdStatus(id, st) {
+  await SB.from('orders').update({status:st}).eq('id',id);
+  toast('Holat yangilandi ✓');
+}
+
+async function loadAProds() {
+  const [{ data: prods }, { data: cats }] = await Promise.all([
+    SB.from('products').select('*').order('created_at',{ascending:false}),
+    SB.from('categories').select('*').order('name')
+  ]);
+  document.getElementById('acont').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+      <div style="font-size:16px;font-weight:800">Mahsulotlar</div>
+      <button class="btn g sm" onclick="openPM()">+ Yangi</button>
+    </div>
+    <div id="palist"></div>`;
+  document.getElementById('palist').innerHTML = (prods||[]).length
+    ? (prods||[]).map(p => {
+        const sz = fz(p.size_qty, p.size_unit);
+        return `<div class="arow">
+          <div class="athumb">${p.image_url ? `<img src="${p.image_url}">` : (p.emoji||'📦')}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700">${p.name}</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:2px">${p.category_name||'—'}${sz?` · <b>${sz}</b>`:''}${p.discount>0?` · <span style="color:#d97706;font-weight:700">-${p.discount}%</span>`:''}</div>
+            <div style="font-size:12px;font-weight:800;color:var(--g);margin-top:2px">${fm(p.price)} <span style="font-size:10px;color:${p.stock<10?'#dc2626':'var(--mu)'};font-weight:600">· Ombor: ${p.stock}</span></div>
+          </div>
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            <button class="btn sm" onclick="openPM('${p.id}')">✏️</button>
+            <button class="btn sm red" onclick="delProd('${p.id}')">🗑</button>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="empty"><div class="eo">📦</div><div class="et">Mahsulotlar yo'q</div><div class="es">+ Yangi tugmasini bosing</div></div>`;
+}
+
+async function openPM(id) {
+  const { data: cats } = await SB.from('categories').select('*').order('name');
+  let p = {stock:0, discount:0, size_qty:'', size_unit:'g', emoji:'📦'};
+  if (id) { const {data} = await SB.from('products').select('*').eq('id',id).single(); if(data) p=data; }
+  document.getElementById('mtitle').textContent = id ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot';
+  document.getElementById('mbody').innerHTML = `
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:13px">
+      <div class="iup" id="iupbtn" onclick="document.getElementById('ifile').click()">
+        ${p.image_url ? `<img src="${p.image_url}">` : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Rasm</span>'}
+      </div>
+      <input type="file" id="ifile" accept="image/*" class="hide" onchange="prevPImg(this)"/>
+      <div style="flex:1">
+        <div class="f"><label>Nomi *</label><input id="mn" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="Masalan: Sut 3.2%"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="f"><label>Narx (so'm) *</label><input type="number" id="mp" value="${p.price||''}" placeholder="15000" inputmode="numeric"/></div>
+          <div class="f"><label>Ombor *</label><input type="number" id="ms" value="${p.stock!==undefined?p.stock:''}" placeholder="100" inputmode="numeric"/></div>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--g4);border:1px solid var(--g3);border-radius:12px;padding:11px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📏 Hajm / O'lchov</div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label>Miqdor</label><input type="number" id="msq" value="${p.size_qty||''}" placeholder="350" step="any" inputmode="decimal"/></div>
+        <div style="width:100px"><label>Birlik</label><select id="msu">${uopts(p.size_unit||'g')}</select></div>
+      </div>
+      <div style="font-size:10px;color:var(--g2);margin-top:5px">Misol: 350 g · 1 l · 500 ml · 6 dona</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="f"><label>Kategoriya</label><select id="mcat"><option value="">— Tanlang —</option>${(cats||[]).map(c=>`<option value="${c.id}"${p.category_id===c.id?' selected':''}>${c.name}</option>`).join('')}</select></div>
+      <div class="f"><label>Chegirma %</label><input type="number" id="mdisc" value="${p.discount||0}" min="0" max="99" inputmode="numeric"/></div>
+      <div class="f"><label>Emoji</label><input id="memo" value="${p.emoji||''}" placeholder="🥛" maxlength="2"/></div>
+    </div>
+    <div class="f"><label>Tavsif</label><textarea id="mdesc" placeholder="Qisqa tavsif...">${p.description||''}</textarea></div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn w" onclick="closeMod()">Bekor</button>
+      <button class="btn g w" onclick="saveProd('${id||''}')">Saqlash</button>
+    </div>`;
+  window._pimg = p.image_url || null;
+  openMod();
+}
+
+function prevPImg(inp) {
+  const f = inp.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { window._pimg = e.target.result; document.getElementById('iupbtn').innerHTML = `<img src="${e.target.result}">`; };
+  r.readAsDataURL(f);
+}
+
+async function saveProd(id) {
+  const name = document.getElementById('mn').value.trim();
+  const price = parseFloat(document.getElementById('mp').value);
+  const stock = parseFloat(document.getElementById('ms').value);
+  if (!name) { toast('Mahsulot nomini kiriting', 'err'); return; }
+  if (isNaN(price) || price <= 0) { toast("Narxni to'g'ri kiriting", 'err'); return; }
+  const catId = document.getElementById('mcat').value;
+  const { data: cats } = await SB.from('categories').select('*');
+  const cat = (cats||[]).find(c => c.id===catId);
+  const np = {
+    name, price, stock: isNaN(stock) ? 0 : stock,
+    size_qty: document.getElementById('msq').value.trim(),
+    size_unit: document.getElementById('msu').value,
+    category_id: catId || null,
+    category_name: cat ? cat.name : '',
+    discount: parseInt(document.getElementById('mdisc').value)||0,
+    emoji: document.getElementById('memo').value || '📦',
+    description: document.getElementById('mdesc').value,
+    image_url: window._pimg || null,
+    is_active: true
+  };
+  const { error } = id
+    ? await SB.from('products').update(np).eq('id', id)
+    : await SB.from('products').insert(np);
+  if (error) { toast('Xatolik: '+error.message, 'err'); return; }
+  closeMod(); loadAProds();
+  toast(id ? 'Mahsulot yangilandi ✓' : "Mahsulot qo'shildi ✓");
+  if (np.stock >= 0 && np.stock < 10) setTimeout(() => toast(np.name+' ombori kam! ('+np.stock+')', 'warn'), 600);
+}
+
+async function delProd(id) {
+  if (!confirm("Mahsulotni o'chirish?")) return;
+  await SB.from('products').update({is_active:false}).eq('id', id);
+  loadAProds(); toast("O'chirildi");
+}
+
+async function loadABoxes() {
+  const { data: boxes } = await SB.from('boxes').select('*').order('created_at',{ascending:false});
+  document.getElementById('acont').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+      <div style="font-size:16px;font-weight:800">Tayyor Boxlar</div>
+      <button class="btn g sm" onclick="openBM()">+ Yangi</button>
+    </div>
+    ${(boxes||[]).length
+      ? (boxes||[]).map(b => `
+          <div style="background:#fff;border:1px solid var(--bd);border-radius:13px;padding:13px;margin-bottom:7px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-weight:800;font-size:14px">${b.name}</div>
+                <div style="font-size:11px;color:var(--mu);margin-top:2px">${(b.items||[]).length} ta mahsulot · ${fm(b.price)}</div>
+                ${b.description?`<div style="font-size:11px;color:var(--mu);margin-top:2px">${b.description}</div>`:''}
+              </div>
+              <div style="display:flex;gap:5px">
+                <button class="btn sm" onclick="openBM('${b.id}')">✏️</button>
+                <button class="btn sm red" onclick="delBox('${b.id}')">🗑</button>
+              </div>
+            </div>
+          </div>`).join('')
+      : `<div class="empty"><div class="eo">📭</div><div class="et">Boxlar yo'q</div></div>`}`;
+}
+
+async function openBM(id) {
+  const { data: prods } = await SB.from('products').select('*').eq('is_active',true).order('name');
+  let b = {items:[]};
+  if (id) { const {data} = await SB.from('boxes').select('*').eq('id',id).single(); if(data) b=data; }
+  window._bxProds = prods || [];
+  document.getElementById('mtitle').textContent = id ? 'Box tahrirlash' : 'Yangi box';
+  document.getElementById('mbody').innerHTML = `
+    <div class="f"><label>Box nomi *</label><input id="bxn" value="${(b.name||'').replace(/"/g,'&quot;')}" placeholder="Haftalik sabzavot box"/></div>
+    <div class="f"><label>Tavsif</label><input id="bxd" value="${(b.description||'').replace(/"/g,'&quot;')}" placeholder="Qisqa tavsif"/></div>
+    <div class="f">
+      <label>Mahsulotlar</label>
+      <div id="bxrows">${(b.items||[]).map((it,i)=>bxRow(i,it,prods||[])).join('')}</div>
+      <button class="btn sm" style="margin-top:7px" onclick="addBxRow()">+ Mahsulot</button>
+    </div>
+    <div style="background:var(--g4);border-radius:9px;padding:8px 11px;font-size:12px;color:#166534;font-weight:700;margin-bottom:12px" id="bxtot"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn w" onclick="closeMod()">Bekor</button>
+      <button class="btn g w" onclick="saveBox('${id||''}')">Saqlash</button>
+    </div>`;
+  calcBxTot(); openMod();
+}
+
+let _bxi = 0;
+function bxRow(i, it, prods) {
+  return `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:flex-end" id="bxr${i}">
+    <div style="flex:2"><select class="bxp" onchange="calcBxTot()" style="height:36px;font-size:12px">
+      <option value="">— Mahsulot —</option>
+      ${prods.map(p=>`<option value="${p.id}" data-price="${p.price}"${it&&it.pid===p.id?' selected':''}>${p.name}${p.size_qty?' ('+fz(p.size_qty,p.size_unit)+')':''}</option>`).join('')}
+    </select></div>
+    <div style="flex:1"><input type="number" class="bxq" value="${it?it.qty:1}" min="1" style="height:36px" oninput="calcBxTot()" inputmode="numeric"/></div>
+    <button class="btn sm red" style="height:36px;flex-shrink:0" onclick="this.closest('[id^=bxr]').remove();calcBxTot()">✕</button>
+  </div>`;
+}
+
+function addBxRow() {
+  _bxi++;
+  const d = document.createElement('div');
+  d.innerHTML = bxRow('n'+_bxi, null, window._bxProds||[]);
+  document.getElementById('bxrows').appendChild(d.firstElementChild);
+}
+
+function calcBxTot() {
+  let t = 0;
+  document.querySelectorAll('#bxrows [id^=bxr]').forEach(r => {
+    const s = r.querySelector('.bxp');
+    const q = parseFloat(r.querySelector('.bxq')?.value) || 0;
+    t += parseFloat(s?.selectedOptions[0]?.dataset?.price||0) * q;
+  });
+  const el = document.getElementById('bxtot');
+  if (el) el.textContent = t > 0 ? 'Box narxi: '+fm(t) : '';
+}
+
+async function saveBox(id) {
+  const name = document.getElementById('bxn').value.trim();
+  if (!name) { toast('Box nomini kiriting', 'err'); return; }
+  const items = []; let tot = 0;
+  document.querySelectorAll('#bxrows [id^=bxr]').forEach(r => {
+    const s = r.querySelector('.bxp');
+    const q = parseFloat(r.querySelector('.bxq')?.value) || 0;
+    const opt = s?.selectedOptions[0];
+    const price = parseFloat(opt?.dataset?.price||0);
+    if (s?.value && q > 0) { items.push({pid:s.value, name:opt.text.split('(')[0].trim(), qty:q, price}); tot+=price*q; }
+  });
+  if (!items.length) { toast('Kamida 1 mahsulot', 'err'); return; }
+  const bx = {name, description:document.getElementById('bxd').value, items, price:tot};
+  const { error } = id
+    ? await SB.from('boxes').update(bx).eq('id', id)
+    : await SB.from('boxes').insert(bx);
+  if (error) { toast('Xatolik: '+error.message, 'err'); return; }
+  closeMod(); loadABoxes(); loadBoxes();
+  toast(id ? 'Box yangilandi ✓' : "Box qo'shildi ✓");
+}
+
+async function delBox(id) {
+  if (!confirm("Box o'chirilsinmi?")) return;
+  await SB.from('boxes').delete().eq('id', id);
+  loadABoxes(); loadBoxes(); toast("O'chirildi");
+}
+
+async function loadAOrds() {
+  const { data: ords } = await SB.from('orders').select('*').order('created_at',{ascending:false});
+  const o = ords || [];
+  const sl = {PENDING:'Kutilmoqda',ACCEPTED:'Qabul',PREPARING:'Tayyor',DELIVERED:'Yetkazildi',CANCELLED:'Bekor'};
+  const sc = {PENDING:'#d97706',ACCEPTED:'#2563eb',PREPARING:'#7c3aed',DELIVERED:'#16a34a',CANCELLED:'#dc2626'};
+  
+  document.getElementById('acont').innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:13px">Buyurtmalar (${o.length})</div>
+    ${o.length ? o.map(x => {
+      const items = x.items || [];
+      return `
+      <div style="background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:10px">
+        
+        <!-- Sarlavha -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div>
+            <div style="font-weight:800;font-size:15px">#${x.id}</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:2px">
+              👤 ${x.client_name||'—'} ${x.client_phone?'· 📞 '+x.client_phone:''}
+            </div>
+            <div style="font-size:11px;color:var(--mu)">${x.created_at?new Date(x.created_at).toLocaleString('uz-UZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:800;color:var(--g);font-size:16px">${fm(x.total)}</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:2px">Xizmat: ${fm(x.fee)}</div>
+          </div>
+        </div>
+        
+        <!-- Mahsulotlar ro'yxati -->
+        <div style="background:#f8fafc;border-radius:10px;padding:10px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📦 Buyurtma tarkibi</div>
+          ${items.map(i => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:16px">${i.emo||i.emoji||'📦'}</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700">${i.name}</div>
+                  <div style="font-size:11px;color:var(--mu)">${i.unit||''} · ${i.qty} ta</div>
+                </div>
+              </div>
+              <div style="font-weight:800;color:var(--g);font-size:13px">${fm(i.price*i.qty)}</div>
+            </div>`).join('')}
+          <div style="display:flex;justify-content:space-between;padding-top:8px;font-weight:800;font-size:14px">
+            <span>Jami</span><span style="color:var(--g)">${fm(x.subtotal||x.total)}</span>
+          </div>
+        </div>
+        
+        <!-- Manzil -->
+        ${x.address?`<div style="font-size:12px;color:var(--mu);margin-bottom:10px">📍 ${x.address}${x.note?` · ${x.note}`:''}</div>`:''}
+        
+        <!-- Holat va chastota -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <select style="height:32px;border-radius:8px;font-size:12px;padding:0 8px;border:2px solid ${sc[x.status]||'#e2e8f0'};font-family:inherit;font-weight:700;color:${sc[x.status]||'var(--mu)'}" onchange="updOrdStatus('${x.id}',this.value)">
+            ${['PENDING','ACCEPTED','PREPARING','DELIVERED','CANCELLED'].map(s=>`<option value="${s}"${x.status===s?' selected':''}>${sl[s]}</option>`).join('')}
+          </select>
+          <span style="font-size:11px;color:var(--mu);background:var(--li);padding:4px 10px;border-radius:100px">${x.freq_label||'Bir martalik'}</span>
+          <span style="font-size:11px;color:var(--mu)">💵 Naqd</span>
+        </div>
+      </div>`;
+    }).join('')
+    : `<div class="empty"><div class="eo">📋</div><div class="et">Buyurtmalar yo'q</div></div>`}`;
+}
+
+async function loadACats() {
+  const [{ data: cats }, { data: prods }] = await Promise.all([
+    SB.from('categories').select('*').order('name'),
+    SB.from('products').select('id,category_id')
+  ]);
+  document.getElementById('acont').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+      <div style="font-size:16px;font-weight:800">Kategoriyalar</div>
+      <button class="btn g sm" onclick="addCat()">+ Yangi</button>
+    </div>
+    ${(cats||[]).map(c => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:5px">
+        <div>
+          <span style="font-weight:700">${c.name}</span>
+          <span style="font-size:11px;color:var(--mu);margin-left:7px">${(prods||[]).filter(p=>p.category_id===c.id).length} mahsulot</span>
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="btn sm" onclick="editCat('${c.id}','${c.name.replace(/'/g,"\\'")}')">✏️</button>
+          <button class="btn sm red" onclick="delCat('${c.id}')">🗑</button>
+        </div>
+      </div>`).join('') || '<p style="color:var(--mu);text-align:center;padding:20px">Kategoriyalar yo\'q</p>'}`;
+}
+
+async function addCat() {
+  const n = prompt("Kategoriya nomi:"); if (!n?.trim()) return;
+  await SB.from('categories').insert({name:n.trim()});
+  loadACats(); toast("Kategoriya qo'shildi ✓");
+}
+async function editCat(id, old) {
+  const n = prompt("Yangi nom:", old); if (!n?.trim()) return;
+  await SB.from('categories').update({name:n.trim()}).eq('id',id);
+  loadACats(); toast("Saqlandi ✓");
+}
+async function delCat(id) {
+  if (!confirm("O'chirilsinmi?")) return;
+  await SB.from('categories').delete().eq('id',id);
+  loadACats(); toast("O'chirildi");
+}
+
+function openMod() { document.getElementById('OV2').classList.add('on'); }
+function closeMod() { document.getElementById('OV2').classList.remove('on'); }
+
+// ═══ INIT ═══
+(function() {
+  const sess = localStorage.getItem('mb_sess');
+  try {
+    const s = JSON.parse(sess);
+    if (s === 'client') {
+      const u = G('client');
+      if (u && u.name && u.address) { startClient(); }
+      else { startOnboard(); }
+    } else if (s === 'admin') {
+      showScr('S3'); loadDash();
+    }
+  } catch(e) {
+    localStorage.removeItem('mb_sess');
+  }
+  // Auto-fill saved phone number
+  autoFillPhone();
+})();
+</script>
+</body>
+</html>
